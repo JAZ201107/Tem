@@ -1,0 +1,33 @@
+services:
+  fyp_mysql:
+    image: mysql:8.0
+    ports:
+      - 3006:3006
+    environment:
+      - MYSQL_ROOT_PASSWORD=uow-fyp-pass
+      - MYSQL_USER=db_admin
+      - MYSQL_PASSWORD=db_admin_pass
+      - MYSQL_DATABASE=UOW_FYP_DB
+    volumes:
+      - fyp_db:/var/lib/mysql
+
+  fyp_app:
+#    image: jinismygirl/fyp_app_deploy
+    image: jinismygirl/fyp_app_local
+    ports:
+      - 8000:8000
+    volumes:
+      - ./Source:/home/uow_fyp
+    command: >
+      sh -c "
+            python manage.py makemigrations &&
+            python manage.py migrate &&
+            python manage.py runserver 0.0.0.0:8000
+            "
+    depends_on:
+      - fyp_mysql
+
+volumes:
+  fyp_db:
+    driver: local
+
